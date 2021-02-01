@@ -10,26 +10,26 @@ import {
   getInterviewsPerDay
  } from "helpers/selectors";
 
-const data = [
+ const data = [
   {
     id: 1,
     label: "Total Interviews",
-    value: 6
+    getValue: getTotalInterviews
   },
   {
     id: 2,
     label: "Least Popular Time Slot",
-    value: "1pm"
+    getValue: getLeastPopularTimeSlot
   },
   {
     id: 3,
     label: "Most Popular Day",
-    value: "Wednesday"
+    getValue: getMostPopularDay
   },
   {
     id: 4,
     label: "Interviews Per Day",
-    value: "2.3"
+    getValue: getInterviewsPerDay
   }
 ];
 
@@ -62,6 +62,12 @@ class Dashboard extends Component {
         interviewers: interviewers.data
       });
     });
+
+    this.socket = new WebSocket(process.env.REACT_APP_WEBSOCKET_URL);
+  }
+
+  componentWillUnmount() {
+    this.socket.close();
   }
 
   componentDidUpdate(previousProps, previousState) {
@@ -92,9 +98,9 @@ class Dashboard extends Component {
         <Panel
           key={panel.id}
           label={panel.label}
-          value={panel.value}
-          onSelect={e => this.selectPanel(panel.id)}
-        />
+          value={panel.getValue(this.state)}
+          onSelect={() => this.selectPanel(panel.id)}
+          />
       ));
 
     return <main className={dashboardClasses}>{panels}</main>;
